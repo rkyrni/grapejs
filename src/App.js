@@ -1,23 +1,61 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import grapesjs from "grapesjs";
+import { useEffect } from "react";
+import TextSection from "./components/textSection";
+import { text } from "./components/text";
+import { twoColumn } from "./components/twoColumn";
 
 function App() {
+  useEffect(() => {
+    const editor = grapesjs.init({
+      container: "#editor",
+      fromElement: true,
+      width: "auto",
+      height: "100vh",
+      storageManager: false,
+      plugins: [],
+      pluginsOpts: {},
+    });
+
+    // Simpel Text
+    editor.BlockManager.add("custom-block", {
+      label: "Simpel Text",
+      category: "Basic",
+      content: {
+        type: "simpel-text",
+      },
+    });
+
+    editor.Components.addType(
+      "simpel-text",
+      text({ attributesClass: "simpel-text" })
+    );
+
+    // Two column
+    editor.BlockManager.add("two-column-block", {
+      label: "Two Column",
+      category: "Layout",
+      content: {
+        type: "two-column-component",
+        leftWidth: "1",
+        rightWidth: "2",
+        gap: "20px",
+      },
+    });
+
+    editor.Components.addType(
+      "two-column-component",
+      twoColumn(editor, { attributesClass: "two-column-component" })
+    );
+
+    return () => {
+      editor.destroy();
+    };
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div id="editor"></div>
     </div>
   );
 }
